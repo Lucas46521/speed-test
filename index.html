@@ -3,37 +3,47 @@
 
 <head>
     <title>Medição de Velocidade de Internet</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 </head>
 
 <body>
-    <div id="controls"></div>
-    <canvas id="speedChart" width="400" height="200"></canvas>
-    <div id="chartData">
-        <h3>Data Utilizada no Gráfico:</h3>
-        <div id="latency"></div>
-        <div id="downloadSpeed"></div>
-        <div id="uploadSpeed"></div>
-    </div>
-
+  <section>
+        <div class="container">
+            <img id="logo" src="logo.png" alt="Logo">
+            <div id="controls"></div>
+            <canvas id="speedChart"></canvas>
+            <div id="chartData">
+                <h3 id="t"></h3>
+                <div id="latency"></div>
+                <div id="downloadSpeed"></div>
+                <div id="uploadSpeed"></div>
+            </div>
+            <img id="loadingGif" src="loading.gif" alt="Loading..." style="display: none;">
+        </div>
+    </section>
     <script type="module">
         import SpeedTest from 'https://cdn.skypack.dev/@cloudflare/speedtest';
 
         const controlEl = document.getElementById('controls');
         const speedChart = document.getElementById('speedChart').getContext('2d');
+        const t = document.getElementById('t');
         let pauseButton, restartButton;
 
         const engine = new SpeedTest({
             autoStart: false
         });
         engine.onRunningChange = running => {
-            controlEl.textContent = running ? 'Running...' : '';
-            if (running) {
-                createPauseButton();
-            } else {
-                createRestartButton();
-            }
-        };
+    controlEl.textContent = running ? 'Running...' : '';
+    t.textContent = running ? 'Calculando...' : 'Dados:'
+    loadingGif.style.display = running ? 'block' : 'none'; // Exibir ou ocultar o GIF de carregamento
+    if (running) {
+        createPauseButton();
+    } else {
+        createRestartButton();
+    }
+};
+
         engine.onResultsChange = ({ type, raw }) => {
             updateChart(engine.results);
             showData(engine.results);
@@ -48,23 +58,27 @@
         engine.onError = (e) => console.log(e);
 
         const playButton = document.createElement('button');
-        playButton.textContent = "Start Speed Measurement";
-        playButton.onclick = () => engine.play();
-        controlEl.appendChild(playButton);
+playButton.textContent = "Start Speed Measurement";
+playButton.id = "startButton"; // Adicionando o ID do CSS ao botão
+playButton.onclick = () => engine.play();
+controlEl.appendChild(playButton);
 
-        function createPauseButton() {
-            pauseButton = document.createElement('button');
-            pauseButton.textContent = "Pause";
-            pauseButton.onclick = () => engine.pause();
-            controlEl.appendChild(pauseButton);
-        }
+function createPauseButton() {
+    pauseButton = document.createElement('button');
+    pauseButton.textContent = "Pause";
+    pauseButton.id = "pauseButton"; // Adicionando o ID do CSS ao botão
+    pauseButton.onclick = () => engine.pause();
+    controlEl.appendChild(pauseButton);
+}
 
-        function createRestartButton() {
-            restartButton = document.createElement('button');
-            restartButton.textContent = "Restart";
-            restartButton.onclick = () => engine.restart();
-            controlEl.appendChild(restartButton);
-        }
+function createRestartButton() {
+    restartButton = document.createElement('button');
+    restartButton.textContent = "Restart";
+    restartButton.id = "restartButton"; // Adicionando o ID do CSS ao botão
+    restartButton.onclick = () => engine.restart();
+    controlEl.appendChild(restartButton);
+}
+
 
         const speedChartData = new Chart(speedChart, {
             type: 'bar',
@@ -144,5 +158,4 @@
         }
     </script>
 </body>
-
 </html>
