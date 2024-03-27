@@ -1,0 +1,88 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    position: relative;
+    width: 400px;
+    height: 500px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    margin: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#controls {
+    margin-bottom: 20px;
+}
+
+#speedChart {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+#chartData {
+    text-align: center;
+}
+
+#chartData > div {
+    margin-bottom: 10px;
+}
+
+section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+}
+#logo {
+    width: 100px; 
+    height: auto; /* Mantém a proporção original da imagem */
+}
+#loadingGif {
+  width: 100px;
+  height: auto;
+}
+#startButton,
+#pauseButton,
+#restartButton {
+    width: 100px;
+    height: 40px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4D8CF0;
+    color: #FFFFFF;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 5px;
+    outline: none;
+}
+
+#startButton:hover,
+#pauseButton:hover,
+#restartButton:hover {
+    background-color: #346CB1;
+}
+
+#startButton:active,
+#pauseButton:active,
+#restartButton:active {
+    transform: scale(0.95);
+}
