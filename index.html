@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Medição de Velocidade de Internet</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+</head>
+
+<body>
+    <div id="controls"></div>
+    <canvas id="speedChart" width="400" height="200"></canvas>
+    <div id="chartData">
+        <h3>Data Utilizada no Gráfico:</h3>
+        <div id="latency"></div>
+        <div id="downloadSpeed"></div>
+        <div id="uploadSpeed"></div>
+    </div>
+
+    <script type="module">
+        import SpeedTest from 'https://cdn.skypack.dev/@cloudflare/speedtest';
+
+        const controlEl = document.getElementById('controls');
+        const speedChart = document.getElementById('speedChart').getContext('2d');
+        let pauseButton, restartButton;
+
+        const engine = new SpeedTest({
+            autoStart: false
+        });
+        engine.onRunningChange = running => {
+            controlEl.textContent = running ? 'Running...' : '';
+            if (running) {
+                createPauseButton();
+            } else {
+                createRestartButton();
+            }
+        };
+        engine.onResultsChange = ({ type, raw }) => {
+            updateChart(engine.results);
+            showData(engine.results);
+        };
+
+        engine.onFinish = results => {
+            endUpdate(results);
+            console.log(results.getSummary());
+            console.log(results.getScores());
+        };
+
+        engine.onError = (e) => console.log(e);
+
+        const playButton = document.createElement('button');
+        playButton.textContent = "Start Speed Measurement";
+        playButton.onclick = () => engine.play();
+        controlEl.appendChild(playButton);
+
+        function createPauseButton() {
+            pauseButton = document.createElement('button');
+            pauseButton.textContent = "Pause";
+            pauseButton.onclick = () => engine.pause();
+            controlEl.appendChild(pauseButton);
+        }
+
+        function createRestartButton() {
+            restartButton = document.createElement('button');
+            restartButton.textContent = "Restart";
+            restartButton.onclick = () => engine.restart();
+            controlEl.appendChild(restartButton);
+        }
+
+        const speedChartData = new Chart(speedChart, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Latency (ms)',
+                    data: [],
+                    backgroundColor: 'red',
+                    fill: false,
+                    inflateAmount: 'auto'
+                },
+                {
+                    label: 'Download Speed (Mbps)',
+                    data: [],
+                    backgroundColor: 'blue',
+                    fill: false
+                },
+                {
+                    label: 'Upload Speed (Mbps)',
+                    data: [],
+                    backgroundColor: 'green',
+                    fill: false
+                }
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+        let latencyEl = document.getElementById('latency');
+        let downloadSpeedEl = document.getElementById('downloadSpeed');
+        let uploadSpeedEl = document.getElementById('uploadSpeed');
+
+        function updateChart(results) {
+            const latencyData = results.getUnloadedLatencyPoints().map(latency => latency.toFixed(2)); // Convertendo para ms
+            const downloadData = results.getDownloadBandwidthPoints().map(point => (point.bps / 1000000).toFixed(2)); // Convertendo para Mbps
+            const uploadData = results.getUploadBandwidthPoints().map(point => (point.bps / 1000000).toFixed(2)); // Convertendo para Mbps
+
+            const labels = Array.from({ length: Math.max(latencyData.length, downloadData.length, uploadData.length) }, (_, i) => i + 1);
+            speedChartData.data.labels = labels;
+            speedChartData.data.datasets[0].data = latencyData;
+            speedChartData.data.datasets[1].data = downloadData;
+            speedChartData.data.datasets[2].data = uploadData;
+            speedChartData.update();
+        }
+
+        function showData(results) {
+            const latencyData = results.getUnloadedLatencyPoints().map(latency => `Latency: ${latency.toFixed(2)} ms`);
+            const downloadData = results.getDownloadBandwidthPoints().map(point => `Download Speed: ${(point.bps / 1000000).toFixed(2)} Mbps`);
+            const uploadData = results.getUploadBandwidthPoints().map(point => `Upload Speed: ${(point.bps / 1000000).toFixed(2)} Mbps`);
+
+            updateText(latencyEl, latencyData[latencyData.length - 1]);
+            updateText(downloadSpeedEl, downloadData[downloadData.length - 1]);
+            updateText(uploadSpeedEl, uploadData[uploadData.length - 1]);
+        }
+
+        function updateText(element, data) {
+            element.textContent = data;
+        }
+
+        function endUpdate(results) {
+            const downloadSpeed = results.download.toFixed(2);
+            const uploadSpeed = results.upload.toFixed(2);
+            const latency = results.latency.toFixed(2);
+
+            updateText(latencyEl, `Latency: ${latency} ms`);
+            updateText(downloadSpeedEl, `Download Speed: ${downloadSpeed} Mbps`);
+            updateText(uploadSpeedEl, `Upload Speed: ${uploadSpeed} Mbps`);
+        }
+    </script>
+</body>
+
+</html>
