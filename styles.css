@@ -10,10 +10,10 @@ body {
     align-items: center;
     justify-content: center;
     height: 100vh;
-    border: 2px solid #ccc; /* Adicionando borda */
-    border-radius: 10px; /* Arredondando as bordas */
-    padding: 20px; /* Adicionando espaçamento interno */
-    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5); /* Adicionando sombra */
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
 }
 
 #controls {
