@@ -17,7 +17,7 @@
                 <div id="downloadSpeed"></div>
                 <div id="uploadSpeed"></div>
             </div>
-            <img id="loadingGif" src="loading.gif" alt="Loading..." style="display: none;">
+            <img id="loadingGif" src="loading1.gif" alt="Loading..." style="display: none;">
         </div>
     </section>
     <script type="module">
@@ -56,7 +56,7 @@
         engine.onError = (e) => console.log(e);
 
         const playButton = document.createElement('button');
-playButton.textContent = "Start Speed Measurement";
+playButton.textContent = "Start";
 playButton.id = "startButton"; // Adicionando o ID do CSS ao botão
 playButton.onclick = () => engine.play();
 controlEl.appendChild(playButton);
