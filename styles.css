@@ -18,13 +18,12 @@ body {
     background: transparent;
     border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 20px;
-    backdrop-filter: blur(15px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 30px;
-    margin: 5px;
+    margin: 5px 0;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -53,11 +52,12 @@ section {
     width: 100%;
 }
 #logo {
+    margin-top: 5vh;
     width: 100px; 
-    height: auto; /* Mantém a proporção original da imagem */
+    height: auto;
 }
 #loadingGif {
-  width: 100px;
+  width: 300px;
   height: auto;
 }
 #startButton,
