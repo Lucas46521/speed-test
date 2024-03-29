@@ -1,83 +1,49 @@
 name: Webhook on Event
 
 on:
-  # Trigger the workflow on push or any other specified event
   push:
-    branches:
-      - main
   pull_request:
-    types: [opened, reopened, closed, edited, assigned, review_requested, ready_for_review]
   issues:
-    types: [opened, reopened, closed, edited, assigned]
   issue_comment:
-    types: [created, edited, deleted]
   milestone:
-    types: [opened, closed, reopened, edited]
-  fork:
-    types: [created]
+  create:
   delete:
-    types: [branch]
+  fork:
   member:
-    types: [added, removed]
+  pull_request_review:
 
 jobs:
   webhook-request:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Send a request to webhook
-      run: |
-        # Determine the event type and relevant information
-        if [ "${{ github.event_name }}" == "push" ]; then
-          event_type="push"
-          event_info="${{ github.event.head_commit.message }}"
-        elif [ "${{ github.event_name }}" == "pull_request" ]; then
-          event_type="pull request"
-          event_info="${{ github.event.pull_request.title }}"
-        elif [ "${{ github.event_name }}" == "issues" ]; then
-          event_type="issue"
-          event_info="${{ github.event.issue.title }}"
-        elif [ "${{ github.event_name }}" == "issue_comment" ]; then
-          event_type="issue comment"
-          event_info="${{ github.event.comment.body }}"
-        elif [ "${{ github.event_name }}" == "milestone" ]; then
-          event_type="milestone"
-          event_info="${{ github.event.milestone.title }}"
-        elif [ "${{ github.event_name }}" == "fork" ]; then
-          event_type="fork"
-          event_info="${{ github.event.forkee.full_name }}"
-        elif [ "${{ github.event_name }}" == "delete" ]; then
-          event_type="delete"
-          event_info="${{ github.event.ref }}"
-        elif [ "${{ github.event_name }}" == "member" ]; then
-          event_type="member"
-          event_info="${{ github.event.member.login }}"
-        fi
-
-        # Send webhook request with dynamic event details
-        RESPONSE=$(curl -H "Content-Type: application/json" -X POST -d '{
+      - name: Identify Repository and Event
+        run: |
+          REPOSITORY=${{ github.repository }}
+          EVENT=${{ github.event_name }}
+          echo "Repository: $REPOSITORY"
+          echo "Event: $EVENT"
+      - name: Send a request to webhook
+        if: success()
+        run: |
+          RESPONSE=$(curl -H "Content-Type: application/json" -X POST -d '{
           "username": "GitHub",
           "content": "@everyone",
           "embeds": [
             {
               "type": "rich",
-              "title": "New Event: $event_type",
-              "description": "New $event_type in repository ${{ github.repository }}: $event_info",
+              "title": "New Changes",
+              "description": "New changes on $REPOSITORY triggered by ${{ github.actor }}",
               "color": 2123412,
               "thumbnail": {
                 "url": "https://avatars.githubusercontent.com/u/160980408?v=4"
               },
               "author": {
                 "name": "${{ github.actor }}",
-                "url": "https://github.com/${{ github.actor }}",
+                "url": "https://github.com/${{ github.actor_id }}",
                 "icon_url": "https://avatars.githubusercontent.com/u/${{ github.actor_id }}?v=4"
               },
-              "url": "https://github.com/${{ github.repository }}"
+              "url": "https://github.com/$REPOSITORY"
             }
           ]
-        }' ${{ secrets.WEBHOOK_URL }})
-
-        echo "Webhook server response: $RESPONSE"
+          }' ${{ secrets.WEBHOOK_URL }})
+          echo "Webhook server response: $RESPONSE"
