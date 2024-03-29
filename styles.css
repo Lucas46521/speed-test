@@ -38,10 +38,11 @@ body {
 
 #chartData {
     text-align: center;
+    margin-bottom: 70px;
 }
 
 #chartData > div {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 section {
@@ -61,7 +62,7 @@ section {
 #loadingGif {
     width: 300px;
     height: auto;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 #startButton,
@@ -89,4 +90,41 @@ section {
 #pauseButton:active,
 #restartButton:active {
     transform: scale(0.95);
+}
+#tabelaInicial {
+    margin-top: 20px;;
+}
+
+#tabelaOculta {
+    margin-top: 20px;
+    position: absolute; /* Alterando para posição absoluta */
+    bottom: 10px; /* Ajustando a distância do bottom conforme necessário */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+    max-width: calc(100% - 40px);
+    overflow-x: auto;
+}
+
+/* Estilo para as subtabelas */
+.subtabela {
+    margin-right: 20px;
+    font-size: 12px;
+}
+
+/* Estilo para os títulos das subtabelas */
+.titulo-subtabela {
+    font-weight: bold;
+}
+
+/* Estilo para os campos de texto */
+.campo-texto {
+    font-weight: bold;
 }
