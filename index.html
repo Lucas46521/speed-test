@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Medição de Velocidade de Internet</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Adicionando jQuery -->
 </head>
+
 <body>
-  <section>
+    <section>
         <div class="container">
             <img id="logo" src="logo.png" alt="Logo">
             <div id="controls"></div>
@@ -18,6 +21,31 @@
                 <div id="uploadSpeed"></div>
             </div>
             <img id="loadingGif" src="loading1.gif" alt="Loading..." style="display: none;">
+            <!-- Tabela inicial -->
+            <div id="tabelaInicial" style="display: none;"></div>
+
+            <!-- Tabela oculta -->
+            <div id="tabelaOculta" style="display: none;">
+                <div class="subtabela">
+                    <p class="titulo-subtabela">Info</p>
+                    <p><span class="campo-texto">IP:</span> <span id="ip"></span></p>
+                    <p><span class="campo-texto">Organização:</span> <span id="org"></span></p>
+                </div>
+                <div class="subtabela" style="display:none;">
+                    <p class="titulo-subtabela">Rede</p>
+                    <p><span class="campo-texto">Continent:</span> <span id="continent"></span></p>
+                    <p><span class="campo-texto">Country:</span> <span id="country"></span></p>
+                    <p><span class="campo-texto">Region:</span> <span id="region"></span></p>
+                    <p><span class="campo-texto">City:</span> <span id="city"></span></p>
+                </div>
+                <div class="subtabela" style="display:none;">
+                    <p class="titulo-subtabela">Timezone</p>
+                    <p><span class="campo-texto">Timezone ID:</span> <span id="timezone_id"></span></p>
+                    <p><span class="campo-texto">Abbr:</span> <span id="timezone_abbr"></span></p>
+                    <p><span class="campo-texto">Is DST:</span> <span id="timezone_dst"></span></p>
+                    <p><span class="campo-texto">Offset:</span> <span id="timezone_offset"></span></p>
+                </div>
+            </div>
         </div>
     </section>
     <script type="module">
@@ -26,21 +54,22 @@
         const controlEl = document.getElementById('controls');
         const speedChart = document.getElementById('speedChart').getContext('2d');
         const t = document.getElementById('t');
+        
         let pauseButton, restartButton;
 
         const engine = new SpeedTest({
             autoStart: false
         });
         engine.onRunningChange = running => {
-    controlEl.textContent = running ? 'Running...' : '';
-    t.textContent = running ? 'Calculando...' : 'Dados:'
-    loadingGif.style.display = running ? 'block' : 'none'; // Exibir ou ocultar o GIF de carregamento
-    if (running) {
-        createPauseButton();
-    } else {
-        createRestartButton();
-    }
-};
+            controlEl.textContent = running ? 'Running...' : '';
+            t.textContent = running ? 'Calculando...' : 'Dados:'
+            loadingGif.style.display = running ? 'block' : 'none';
+            if (running) {
+                createPauseButton();
+            } else {
+                createRestartButton();
+            }
+        };
 
         engine.onResultsChange = ({ type, raw }) => {
             updateChart(engine.results);
@@ -48,34 +77,35 @@
         };
 
         engine.onFinish = results => {
-            endUpdate(results);
-            console.log(results.getSummary());
-            console.log(results.getScores());
-        };
+    endUpdate(results);
+    console.log(results.getSummary());
+    console.log(results.getScores());
+    tabelaInicial.style.display = 'block'; // Exibindo a tabela inicial ao finalizar o teste
+};
 
         engine.onError = (e) => console.log(e);
 
         const playButton = document.createElement('button');
-playButton.textContent = "Start";
-playButton.id = "startButton"; // Adicionando o ID do CSS ao botão
-playButton.onclick = () => engine.play();
-controlEl.appendChild(playButton);
+        playButton.textContent = "Start";
+        playButton.id = "startButton"; // Adicionando o ID do CSS ao botão
+        playButton.onclick = () => engine.play();
+        controlEl.appendChild(playButton);
 
-function createPauseButton() {
-    pauseButton = document.createElement('button');
-    pauseButton.textContent = "Pause";
-    pauseButton.id = "pauseButton"; // Adicionando o ID do CSS ao botão
-    pauseButton.onclick = () => engine.pause();
-    controlEl.appendChild(pauseButton);
-}
+        function createPauseButton() {
+            pauseButton = document.createElement('button');
+            pauseButton.textContent = "Pause";
+            pauseButton.id = "pauseButton"; // Adicionando o ID do CSS ao botão
+            pauseButton.onclick = () => engine.pause();
+            controlEl.appendChild(pauseButton);
+        }
 
-function createRestartButton() {
-    restartButton = document.createElement('button');
-    restartButton.textContent = "Restart";
-    restartButton.id = "restartButton"; // Adicionando o ID do CSS ao botão
-    restartButton.onclick = () => engine.restart();
-    controlEl.appendChild(restartButton);
-}
+        function createRestartButton() {
+            restartButton = document.createElement('button');
+            restartButton.textContent = "Restart";
+            restartButton.id = "restartButton"; // Adicionando o ID do CSS ao botão
+            restartButton.onclick = () => engine.restart();
+            controlEl.appendChild(restartButton);
+        }
 
 
         const speedChartData = new Chart(speedChart, {
@@ -83,24 +113,24 @@ function createRestartButton() {
             data: {
                 labels: [],
                 datasets: [{
-                    label: 'Latency (ms)',
-                    data: [],
-                    backgroundColor: 'red',
-                    fill: false,
-                    inflateAmount: 'auto'
-                },
-                {
-                    label: 'Download Speed (Mbps)',
-                    data: [],
-                    backgroundColor: 'blue',
-                    fill: false
-                },
-                {
-                    label: 'Upload Speed (Mbps)',
-                    data: [],
-                    backgroundColor: 'green',
-                    fill: false
-                }
+                        label: 'Latency (ms)',
+                        data: [],
+                        backgroundColor: 'red',
+                        fill: false,
+                        inflateAmount: 'auto'
+                    },
+                    {
+                        label: 'Download Speed (Mbps)',
+                        data: [],
+                        backgroundColor: 'blue',
+                        fill: false
+                    },
+                    {
+                        label: 'Upload Speed (Mbps)',
+                        data: [],
+                        backgroundColor: 'green',
+                        fill: false
+                    }
                 ]
             },
             options: {
@@ -123,7 +153,9 @@ function createRestartButton() {
             const downloadData = results.getDownloadBandwidthPoints().map(point => (point.bps / 1000000).toFixed(2)); // Convertendo para Mbps
             const uploadData = results.getUploadBandwidthPoints().map(point => (point.bps / 1000000).toFixed(2)); // Convertendo para Mbps
 
-            const labels = Array.from({ length: Math.max(latencyData.length, downloadData.length, uploadData.length) }, (_, i) => i + 1);
+            const labels = Array.from({
+                length: Math.max(latencyData.length, downloadData.length, uploadData.length)
+            }, (_, i) => i + 1);
             speedChartData.data.labels = labels;
             speedChartData.data.datasets[0].data = latencyData;
             speedChartData.data.datasets[1].data = downloadData;
@@ -154,6 +186,63 @@ function createRestartButton() {
             updateText(downloadSpeedEl, `Download Speed: ${downloadSpeed} Mbps`);
             updateText(uploadSpeedEl, `Upload Speed: ${uploadSpeed} Mbps`);
         }
+
+        // Função para obter informações de IP
+        function obterInformacoesIP() {
+            $.getJSON("https://ipwho.is/", function(response) {
+                $('#ip').text(response.ip);
+                $('#org').text(response.connection.org);
+                // Subtabela "Rede"
+                $('#continent').text(response.continent);
+                $('#country').text(response.country);
+                $('#region').text(response.region);
+                $('#city').text(response.city);
+                // Subtabela "Timezone"
+                $('#timezone_id').text(response.timezone.id);
+                $('#timezone_abbr').text(response.timezone.abbr);
+                $('#timezone_dst').text(response.timezone.is_dst);
+                $('#timezone_offset').text(response.timezone.offset);
+                // Exibir todas as subtabelas
+                $('.subtabela').show();
+            });
+        }
+
+        // Função para expandir a tabela ao clicar
+        function expandirTabela() {
+            obterInformacoesIP();
+            // Remover o evento de clique após a expansão da tabela
+            $('#tabelaOculta').off('click', expandirTabela);
+            // Adicionar evento de clique para contrair a tabela
+            $('#tabelaOculta').on('click', contrairTabela);
+        }
+
+        // Função para contrair a tabela ao clicar
+        function contrairTabela() {
+            // Esconder todas as subtabelas
+            $('.subtabela').hide();
+            // Exibir apenas a primeira subtabela
+            $('#tabelaOculta > .subtabela:first-child').show();
+            // Remover o evento de clique após a contração da tabela
+            $('#tabelaOculta').off('click', contrairTabela);
+            // Adicionar evento de clique para expandir a tabela
+            $('#tabelaOculta').on('click', expandirTabela);
+        }
+
+        function firstInfo() {
+            $.getJSON("https://ipwho.is/", function(response) {
+                $('#ip').text(response.ip);
+                $('#org').text(response.connection.org);
+                // Exibir a tabela oculta
+                $('#tabelaOculta').show();
+                $('#tabelaOculta').on('click', expandirTabela);
+            });
+        }
+
+        // Chamar a função das primeiras informações ao carregar a página
+        $(document).ready(function() {
+            firstInfo();
+        });
     </script>
 </body>
+
 </html>
