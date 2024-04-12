@@ -5,7 +5,8 @@
     <title>Medição de Velocidade de Internet</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Adicionando jQuery -->
+    <link rel="stylesheet" href="https://unpkg.com/charts.css/dist/charts.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -13,7 +14,7 @@
         <div class="container">
             <img id="logo" src="logo.png" alt="Logo">
             <div id="controls"></div>
-            <canvas id="speedChart"></canvas>
+            <canvas class="charts-css" id="speedChart"></canvas>
             <div id="chartData">
                 <h3 id="t"></h3>
                 <div id="latency"></div>
