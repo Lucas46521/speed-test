@@ -4,7 +4,9 @@
 <head>
     <title>Medição de Velocidade de Internet</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.7"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
@@ -13,14 +15,14 @@
         <div class="container">
             <img id="logo" src="logo.png" alt="Logo">
             <div id="controls"></div>
-            <canvas id="speedChart"></canvas>
+            <canvas id="speedChart" style="background-color: transparent; border: 2px solid #000; border-radius: 30px;"></canvas>
             <div id="chartData">
                 <h3 id="t"></h3>
                 <div id="latency"></div>
                 <div id="downloadSpeed"></div>
                 <div id="uploadSpeed"></div>
-            </div>
             <img id="loadingGif" src="loading1.gif" alt="Loading..." style="display: none;">
+            </div>
             <!-- Tabela inicial -->
             <div id="tabelaInicial" style="display: none;"></div>
 
@@ -106,8 +108,13 @@
             restartButton.onclick = () => engine.restart();
             controlEl.appendChild(restartButton);
         }
+        var bar_ctx = document.getElementById("speedChart").getContext("2d");
 
-
+        var down_back = bar_ctx.createLinearGradient(0, 180, 0, 0);
+        down_back.addColorStop(0, '#cfd1ff'); 
+        down_back.addColorStop(0.8, 'blue');
+        down_back.addColorStop(1, 'blue'); 
+     
         const speedChartData = new Chart(speedChart, {
             type: 'bar',
             data: {
@@ -122,7 +129,7 @@
                     {
                         label: 'Download Speed (Mbps)',
                         data: [],
-                        backgroundColor: 'blue',
+                        backgroundColor: down_back,
                         fill: false
                     },
                     {
@@ -140,7 +147,47 @@
                             beginAtZero: true
                         }
                     }]
-                }
+                },
+                plugins: {
+                 zoom: {
+              		pan: {
+              			enabled: true,
+                    mode: 'xy',
+              			rangeMin: {
+              				x: null,
+              				y: null
+              			},
+              			rangeMax: {
+              				x: null,
+              				y: null
+              			},
+              
+              			speed: 20,
+              			threshold: 10,
+              		},
+              
+              		zoom: {
+              			enabled: true,
+              			drag: true,
+              			mode: 'xy',
+              			rangeMin: {
+              				x: null,
+              				y: null
+              			},
+              			rangeMax: {
+              				x: null,
+              				y: null
+              			},
+              
+              			speed: 0.1,
+              
+              			threshold: 2,
+              
+              			sensitivity: 3,
+              
+              		}
+              	}
+              }
             }
         });
 
